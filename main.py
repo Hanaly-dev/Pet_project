@@ -13,10 +13,21 @@ async def lifespan(app: FastAPI):
     yield
 
 
+from fastapi.middleware.cors import CORSMiddleware
+
 app = FastAPI(
     title="Gemini API",
     lifespan=lifespan
     )
+
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"], 
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.post("/")
 def send_prompt(
@@ -34,7 +45,7 @@ def get_requests(request:Request):
     user_requests=get_user_requests(ip_address=user_ip_address)
     return user_requests
 
-@app.get("my_requests/{request_id}")
+@app.get("/my_requests/{request_id}")
 def get_request(request:Request,request_id:int):
     user_ip_address=request.client.host
     user_request=get_user_requests(ip_address=user_ip_address)[request_id]
